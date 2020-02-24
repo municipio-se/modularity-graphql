@@ -1,0 +1,12 @@
+{
+    "name": "municipio/modularity-graphql",
+    "description": "Adds Modularity modules to the WPGraphQL Schema",
+    "type": "wordpress-plugin",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Whitespace Dev",
+            "email": "code@whitespace.se"
+        }
+    ]
+}
