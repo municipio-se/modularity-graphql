@@ -10,8 +10,9 @@
 
 namespace ModularityGraphQL;
 
-use WPGraphQL\AppContext;
 use GraphQL\Type\Definition\ResolveInfo;
+use WPGraphQL\ACF\Config;
+use WPGraphQL\AppContext;
 use WPGraphQL\Data\DataSource;
 
 function _ws_kebab_to_camel($string, $capitalizeFirstCharacter = false) {
@@ -22,18 +23,39 @@ function _ws_kebab_to_camel($string, $capitalizeFirstCharacter = false) {
   return $str;
 }
 
-/**
- * TODO: GraphQL types and fields can’t start with digits, so we have to set a
- * new name for the 404 options page if we want to use it.
- */
-// add_filter('acf/validate_options_page', function ($page) {
-//   switch ($page['menu_slug']) {
-//     case 'acf-options-404':
-//       $page['page_title'] = 'Error pages';
-//       $page['menu_title'] = 'Error pages';
-//   }
-//   return $page;
-// });
+add_filter('acf/load_field_group', function ($field_group) {
+  if (
+    preg_match('/^\d/', $field_group['title']) &&
+    empty($field_group['graphql_field_name'])
+  ) {
+    $field_group['graphql_field_name'] = Config::camel_case(
+      'group' . $field_group['title']
+    );
+  }
+  return $field_group;
+});
+
+add_filter('acf/load_field', function ($field) {
+  if (
+    preg_match('/^\d/', $field['name']) &&
+    empty($field['graphql_field_name'])
+  ) {
+    $field['graphql_field_name'] = Config::camel_case('field' . $field['name']);
+  }
+  return $field;
+});
+
+add_filter('acf/get_options_page', function ($options_page) {
+  if (
+    preg_match('/^\d/', $options_page['page_title']) &&
+    !empty($options_page['show_in_graphql'])
+  ) {
+    $options_page['page_title'] = Config::camel_case(
+      'Options for ' . $options_page['page_title']
+    );
+  }
+  return $options_page;
+});
 
 add_filter('acf/validate_options_page', function ($page) {
   switch ($page['menu_slug']) {
@@ -45,7 +67,7 @@ add_filter('acf/validate_options_page', function ($page) {
     case 'acf-options-footer':
     case 'acf-options-search':
     case 'acf-options-archives':
-    // case 'acf-options-404':
+    case 'acf-options-404':
     case 'acf-options-google-translate':
     case 'acf-options-content-editor':
     case 'acf-options-post-types':
