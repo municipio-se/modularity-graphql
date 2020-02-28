@@ -188,6 +188,19 @@ add_action(
           },
         ]
       );
+
+      // Add `hideTitle` field to all modularity modules
+      $type_registry->register_field(
+        $post_type_object->graphql_single_name,
+        'hideTitle',
+        [
+          'type' => 'Boolean',
+          'resolve' => function ($post) {
+            $meta = get_post_meta($post->ID, 'modularity-module-hide-title', true);
+            return $meta ?: false;
+          },
+        ]
+      );
     }
     $type_registry->register_union_type('ModularityModule', [
       'typeNames' => array_values($module_types),
