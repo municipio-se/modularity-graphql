@@ -222,3 +222,46 @@ add_action(
   10,
   1
 );
+
+/**
+ * Adds support for dynamic_table ACF fields
+ */
+add_filter(
+  'wpgraphql_acf_supported_fields',
+  function ($supported_fields) {
+    $supported_fields['dynamic_table'];
+    return $supported_fields;
+  },
+  10,
+  1
+);
+
+/**
+ * Adds support for dynamic_table ACF fields
+ */
+add_filter(
+  'wpgraphql_acf_register_graphql_field',
+  function ($field_config, $type_name, $field_name, $config) {
+    $acf_field = isset($config['acf_field']) ? $config['acf_field'] : null;
+    $acf_type = isset($acf_field['type']) ? $acf_field['type'] : null;
+
+    switch ($acf_type) {
+      case 'dynamic_table':
+        $field_config['type'] = 'String';
+        $field_config['resolve'] = function (
+          $root,
+          $args,
+          $context,
+          $info
+        ) use ($acf_field) {
+          $field_value = get_field($acf_field['key'], $root->ID, false);
+          return $field_value;
+        };
+        break;
+    }
+
+    return $field_config;
+  },
+  10,
+  4
+);
