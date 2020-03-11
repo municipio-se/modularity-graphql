@@ -196,7 +196,11 @@ add_action(
         [
           'type' => 'Boolean',
           'resolve' => function ($post) {
-            $meta = get_post_meta($post->ID, 'modularity-module-hide-title', true);
+            $meta = get_post_meta(
+              $post->ID,
+              'modularity-module-hide-title',
+              true
+            );
             return $meta ?: false;
           },
         ]
@@ -208,16 +212,12 @@ add_action(
         return $type_registry->get_type($module_types[$module->post_type]);
       },
     ]);
-    $type_registry->register_field(
-      "MediaItem",
-      'fileSize',
-      [
-        'type' => 'Int',
-        'resolve' => function ($media_item) {
-          return filesize(get_attached_file($media_item->ID));
-        },
-      ]
-    );
+    $type_registry->register_field("MediaItem", 'fileSize', [
+      'type' => 'Int',
+      'resolve' => function ($media_item) {
+        return filesize(get_attached_file($media_item->ID));
+      },
+    ]);
     $type_registry->register_field("MediaItem", 'width', [
       'type' => 'Integer',
       'args' => [
