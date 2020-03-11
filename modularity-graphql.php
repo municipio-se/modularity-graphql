@@ -218,6 +218,54 @@ add_action(
         },
       ]
     );
+    $type_registry->register_field("MediaItem", 'width', [
+      'type' => 'Integer',
+      'args' => [
+        'size' => [
+          'type' => 'MediaItemSizeEnum',
+          'description' => __(
+            'Size of the MediaItem to calculate sizes with',
+            'wp-graphql'
+          ),
+        ],
+      ],
+      'description' => __(
+        'The width attribute value for an image.',
+        'wp-graphql'
+      ),
+      'resolve' => function ($source, $args) {
+        $size = 'medium';
+        if (!empty($args['size'])) {
+          $size = $args['size'];
+        }
+        $src = wp_get_attachment_image_src($source->ID, $size);
+        return $src[1];
+      },
+    ]);
+    $type_registry->register_field("MediaItem", 'height', [
+      'type' => 'Integer',
+      'args' => [
+        'size' => [
+          'type' => 'MediaItemSizeEnum',
+          'description' => __(
+            'Size of the MediaItem to calculate sizes with',
+            'wp-graphql'
+          ),
+        ],
+      ],
+      'description' => __(
+        'The height attribute value for an image.',
+        'wp-graphql'
+      ),
+      'resolve' => function ($source, $args) {
+        $size = 'medium';
+        if (!empty($args['size'])) {
+          $size = $args['size'];
+        }
+        $src = wp_get_attachment_image_src($source->ID, $size);
+        return $src[2];
+      },
+    ]);
   },
   10,
   1
