@@ -164,6 +164,18 @@ add_action(
           },
         ]
       );
+
+      // Add `postType` field to all post types
+      $type_registry->register_field(
+        $post_type_object->graphql_single_name,
+        'postType',
+        [
+          'type' => 'String',
+          'resolve' => function ($post) {
+            return $post->post_type;
+          },
+        ]
+      );
     }
 
     global $wp_post_types;
