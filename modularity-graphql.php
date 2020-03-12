@@ -164,6 +164,18 @@ add_action(
           },
         ]
       );
+
+      // Add `postType` field to all post types
+      $type_registry->register_field(
+        $post_type_object->graphql_single_name,
+        'postType',
+        [
+          'type' => 'String',
+          'resolve' => function ($post) {
+            return $post->post_type;
+          },
+        ]
+      );
     }
 
     global $wp_post_types;
@@ -196,11 +208,7 @@ add_action(
         [
           'type' => 'Boolean',
           'resolve' => function ($post) {
-            $meta = get_post_meta(
-              $post->ID,
-              'modularity-module-hide-title',
-              true
-            );
+            $meta = get_post_meta($post->ID, 'modularity-module-hide-title', true);
             return $meta ?: false;
           },
         ]
@@ -212,104 +220,17 @@ add_action(
         return $type_registry->get_type($module_types[$module->post_type]);
       },
     ]);
-    $type_registry->register_field("MediaItem", 'fileSize', [
-      'type' => 'Int',
-      'resolve' => function ($media_item) {
-        return filesize(get_attached_file($media_item->ID));
-      },
-    ]);
-    $type_registry->register_field("MediaItem", 'width', [
-      'type' => 'Integer',
-      'args' => [
-        'size' => [
-          'type' => 'MediaItemSizeEnum',
-          'description' => __(
-            'Size of the MediaItem to calculate sizes with',
-            'wp-graphql'
-          ),
-        ],
-      ],
-      'description' => __(
-        'The width attribute value for an image.',
-        'wp-graphql'
-      ),
-      'resolve' => function ($source, $args) {
-        $size = 'medium';
-        if (!empty($args['size'])) {
-          $size = $args['size'];
-        }
-        $src = wp_get_attachment_image_src($source->ID, $size);
-        return $src[1];
-      },
-    ]);
-    $type_registry->register_field("MediaItem", 'height', [
-      'type' => 'Integer',
-      'args' => [
-        'size' => [
-          'type' => 'MediaItemSizeEnum',
-          'description' => __(
-            'Size of the MediaItem to calculate sizes with',
-            'wp-graphql'
-          ),
-        ],
-      ],
-      'description' => __(
-        'The height attribute value for an image.',
-        'wp-graphql'
-      ),
-      'resolve' => function ($source, $args) {
-        $size = 'medium';
-        if (!empty($args['size'])) {
-          $size = $args['size'];
-        }
-        $src = wp_get_attachment_image_src($source->ID, $size);
-        return $src[2];
-      },
-    ]);
+    $type_registry->register_field(
+      "MediaItem",
+      'fileSize',
+      [
+        'type' => 'Int',
+        'resolve' => function ($media_item) {
+          return filesize(get_attached_file($media_item->ID));
+        },
+      ]
+    );
   },
   10,
   1
-);
-
-/**
- * Adds support for dynamic_table ACF fields
- */
-add_filter(
-  'wpgraphql_acf_supported_fields',
-  function ($supported_fields) {
-    $supported_fields['dynamic_table'];
-    return $supported_fields;
-  },
-  10,
-  1
-);
-
-/**
- * Adds support for dynamic_table ACF fields
- */
-add_filter(
-  'wpgraphql_acf_register_graphql_field',
-  function ($field_config, $type_name, $field_name, $config) {
-    $acf_field = isset($config['acf_field']) ? $config['acf_field'] : null;
-    $acf_type = isset($acf_field['type']) ? $acf_field['type'] : null;
-
-    switch ($acf_type) {
-      case 'dynamic_table':
-        $field_config['type'] = 'String';
-        $field_config['resolve'] = function (
-          $root,
-          $args,
-          $context,
-          $info
-        ) use ($acf_field) {
-          $field_value = get_field($acf_field['key'], $root->ID, false);
-          return $field_value;
-        };
-        break;
-    }
-
-    return $field_config;
-  },
-  10,
-  4
 );
