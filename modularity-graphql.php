@@ -11,9 +11,11 @@
 namespace ModularityGraphQL;
 
 use GraphQL\Type\Definition\ResolveInfo;
+use GraphQLRelay\Relay;
 use WPGraphQL\ACF\Config;
 use WPGraphQL\AppContext;
 use WPGraphQL\Data\DataSource;
+use WPGraphQL\Model\Post;
 
 function _ws_kebab_to_camel($string, $capitalizeFirstCharacter = false) {
   $str = str_replace('-', '', ucwords($string, '-'));
@@ -276,6 +278,63 @@ add_action(
         }
         $src = wp_get_attachment_image_src($source->ID, $size);
         return $src[2];
+      },
+    ]);
+
+    // Add `posts` field to `ModPosts`
+    $type_registry->register_connection([
+      'fromType' => 'ModPosts',
+      'fromFieldName' => 'posts',
+      'toType' => 'PostObjectUnion',
+      // 'connectionArgs' => [],
+      'resolveNode' => function ($id, $args, $context, $info) {
+        return DataSource::resolve_post_object($id, $context);
+      },
+      'resolve' => function ($root, $args, $context, $info) {
+        // TODO: Use `posts_count` field as limit in wp query
+        $data_source = get_field('posts_data_source', $root->ID, false);
+        switch ($data_source) {
+          case 'manual':
+            $data_posts = get_field('posts_data_posts', $root->ID, false);
+            $connection = Relay::connectionFromArray($data_posts, $args);
+            $nodes = [];
+            if (
+              !empty($connection['edges']) &&
+              is_array($connection['edges'])
+            ) {
+              foreach ($connection['edges'] as $edge) {
+                $nodes[] = !empty($edge['node']) ? $edge['node'] : null;
+              }
+            }
+            $connection['nodes'] = !empty($nodes) ? $nodes : null;
+            return $connection;
+            break;
+          case 'children':
+            $data_child_of = get_field('posts_data_child_of', $root->ID, false);
+            $parent = new Post(get_post($data_child_of));
+            $post_types = \WPGraphQL::get_allowed_post_types();
+            $connection = DataSource::resolve_post_objects_connection(
+              $parent,
+              $args,
+              $context,
+              $info,
+              $post_types
+            );
+            return $connection;
+            break;
+          case 'posttype':
+            $post_type = get_field('posts_data_post_type', $root->ID, false);
+            $connection = DataSource::resolve_post_objects_connection(
+              null,
+              $args,
+              $context,
+              $info,
+              $post_type
+            );
+            return $connection;
+            break;
+        }
+        return null;
       },
     ]);
   },
