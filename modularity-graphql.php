@@ -16,6 +16,8 @@ use WPGraphQL\ACF\Config;
 use WPGraphQL\AppContext;
 use WPGraphQL\Data\DataSource;
 use WPGraphQL\Model\Post;
+use WPGraphQL\Model\PostType;
+
 
 function _ws_kebab_to_camel($string, $capitalizeFirstCharacter = false) {
   $str = str_replace('-', '', ucwords($string, '-'));
@@ -377,6 +379,20 @@ add_filter(
           return $field_value;
         };
         break;
+      case 'posttype_select':
+        $field_config['type'] = 'PostType';
+        $field_config['resolve'] = function (
+          $root,
+          $args,
+          $context,
+          $info
+        ) use ($acf_field) {
+          $field_value = get_field($acf_field['key'], $root->ID, false);
+          return new PostType( get_post_type_object( $field_value ) );
+        };
+      break;
+
+
     }
 
     return $field_config;
