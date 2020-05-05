@@ -388,6 +388,7 @@ add_filter(
           $info
         ) use ($acf_field) {
           $field_value = get_field($acf_field['key'], $root->ID, false);
+          if (empty($field_value)) return null;
           return new PostType( get_post_type_object( $field_value ) );
         };
       break;
