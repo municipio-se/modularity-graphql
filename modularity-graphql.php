@@ -150,7 +150,7 @@ add_action(
       ],
     ]);
 
-    $post_types = ['page', 'post'];
+    $post_types = ['page', 'post', 'operation-message'];
 
     foreach ($wp_post_types as $post_type_object) {
       if (!in_array($post_type_object->name, $post_types)) {
