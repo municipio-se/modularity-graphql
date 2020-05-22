@@ -144,7 +144,11 @@ add_action(
         'hidden' => [
           'type' => 'Boolean',
           'resolve' => function ($module) {
-            return $module['hidden'] === "true" ? true : false;
+           if( is_string($module['hidden']) ) {
+            return $module['hidden'] === "true";
+           } 
+
+           return $module['hidden'];
           },
         ],
       ],
