@@ -348,6 +348,35 @@ add_action(
   1
 );
 
+add_action(
+  'graphql_register_types',
+  function ($type_registry) {
+    $type_registry->register_field(
+      'ModPosts_Datasource_data',
+      'postContentMedia',
+      [
+        'type' => ['list_of' => 'MediaItem'],
+        'resolve' => function ($source) {
+          $post_content = $source['field_57625914110b2'];
+          $post_content = apply_filters('the_content', $post_content);
+          preg_match_all(
+            '/wp-(?:image|caption)-(\d+)/',
+            $post_content,
+            $matches
+          );
+          $posts = array_map(function ($id) {
+            $post = get_post($id);
+            return new Post($post);
+          }, array_unique($matches[1]));
+          return $posts;
+        },
+      ]
+    );
+  },
+  10,
+  1
+);
+
 /**
  * Adds support for dynamic_table ACF fields
  */
