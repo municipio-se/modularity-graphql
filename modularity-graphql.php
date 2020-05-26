@@ -18,7 +18,6 @@ use WPGraphQL\Data\DataSource;
 use WPGraphQL\Model\Post;
 use WPGraphQL\Model\PostType;
 
-
 function _ws_kebab_to_camel($string, $capitalizeFirstCharacter = false) {
   $str = str_replace('-', '', ucwords($string, '-'));
   if (!$capitalizeFirstCharacter) {
@@ -144,11 +143,11 @@ add_action(
         'hidden' => [
           'type' => 'Boolean',
           'resolve' => function ($module) {
-           if( is_string($module['hidden']) ) {
-            return $module['hidden'] === "true";
-           } 
+            if (is_string($module['hidden'])) {
+              return $module['hidden'] === "true";
+            }
 
-           return $module['hidden'];
+            return $module['hidden'];
           },
         ],
       ],
@@ -421,12 +420,12 @@ add_filter(
           $info
         ) use ($acf_field) {
           $field_value = get_field($acf_field['key'], $root->ID, false);
-          if (empty($field_value)) return null;
-          return new PostType( get_post_type_object( $field_value ) );
+          if (empty($field_value)) {
+            return null;
+          }
+          return new PostType(get_post_type_object($field_value));
         };
-      break;
-
-
+        break;
     }
 
     return $field_config;
