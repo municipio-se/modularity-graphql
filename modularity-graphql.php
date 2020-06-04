@@ -233,11 +233,11 @@ add_action(
           [
             'type' => 'String',
             'resolve' => function ($post) {
-              return wp_create_nonce( 'mod-form-' . $post->ID );
+              return wp_create_nonce('mod-form-' . $post->ID);
             },
           ]
         );
-      }      
+      }
     }
     $type_registry->register_union_type('ModularityModule', [
       'typeNames' => array_values($module_types),
