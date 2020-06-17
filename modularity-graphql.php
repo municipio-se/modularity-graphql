@@ -326,6 +326,23 @@ add_action(
               }
             }
             $connection['nodes'] = !empty($nodes) ? $nodes : null;
+            $connection = apply_filters(
+              'modularity-graphql/ModPosts/posts/connection',
+              $connection,
+              $data_source,
+              $root,
+              $args,
+              $context,
+              $info
+            );
+            $connection = apply_filters(
+              "modularity-graphql/ModPosts/posts/connection/manual",
+              $connection,
+              $root,
+              $args,
+              $context,
+              $info
+            );
             return $connection;
             break;
           case 'children':
@@ -339,6 +356,23 @@ add_action(
               $info,
               $post_types
             );
+            $connection = apply_filters(
+              'modularity-graphql/ModPosts/posts/connection',
+              $connection,
+              $data_source,
+              $root,
+              $args,
+              $context,
+              $info
+            );
+            $connection = apply_filters(
+              "modularity-graphql/ModPosts/posts/connection/children",
+              $connection,
+              $root,
+              $args,
+              $context,
+              $info
+            );
             return $connection;
             break;
           case 'posttype':
@@ -349,6 +383,32 @@ add_action(
               $context,
               $info,
               $post_type
+            );
+            $connection = apply_filters(
+              'modularity-graphql/ModPosts/posts/connection',
+              $connection,
+              $data_source,
+              $root,
+              $args,
+              $context,
+              $info
+            );
+            $connection = apply_filters(
+              "modularity-graphql/ModPosts/posts/connection/posttype",
+              $connection,
+              $post_type,
+              $root,
+              $args,
+              $context,
+              $info
+            );
+            $connection = apply_filters(
+              "modularity-graphql/ModPosts/posts/connection/posttype/$post_type",
+              $connection,
+              $root,
+              $args,
+              $context,
+              $info
             );
             return $connection;
             break;
