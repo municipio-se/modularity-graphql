@@ -171,18 +171,6 @@ add_action(
           },
         ]
       );
-
-      // Add `postType` field to all post types
-      $type_registry->register_field(
-        $post_type_object->graphql_single_name,
-        'postType',
-        [
-          'type' => 'String',
-          'resolve' => function ($post) {
-            return $post->post_type;
-          },
-        ]
-      );
     }
 
     global $wp_post_types;
@@ -195,18 +183,6 @@ add_action(
 
       // Populate map of post type slugs and their graphql names
       $module_types[$post_type_slug] = $post_type_object->graphql_single_name;
-
-      // Add `postType` field to all modularity modules
-      $type_registry->register_field(
-        $post_type_object->graphql_single_name,
-        'postType',
-        [
-          'type' => 'String',
-          'resolve' => function ($post) {
-            return $post->post_type;
-          },
-        ]
-      );
 
       // Add `hideTitle` field to all modularity modules
       $type_registry->register_field(
@@ -243,12 +219,6 @@ add_action(
       'typeNames' => array_values($module_types),
       'resolveType' => function ($module) use ($module_types, $type_registry) {
         return $type_registry->get_type($module_types[$module->post_type]);
-      },
-    ]);
-    $type_registry->register_field("MediaItem", 'fileSize', [
-      'type' => 'Int',
-      'resolve' => function ($media_item) {
-        return filesize(get_attached_file($media_item->ID));
       },
     ]);
     $type_registry->register_field("MediaItem", 'width', [
@@ -486,7 +456,7 @@ add_filter(
         };
         break;
       case 'posttype_select':
-        $field_config['type'] = 'PostType';
+        $field_config['type'] = 'ContentType';
         $field_config['resolve'] = function (
           $root,
           $args,
