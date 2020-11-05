@@ -251,6 +251,12 @@ add_action(
         return filesize(get_attached_file($media_item->ID));
       },
     ]);
+    $type_registry->register_field("MediaItem", 'fileContent', [
+      'type' => 'String',
+      'resolve' => function ($media_item) {
+        return file_get_contents($media_item->mediaItemUrl);
+      },
+    ]);
     $type_registry->register_field("MediaItem", 'width', [
       'type' => 'Integer',
       'args' => [
