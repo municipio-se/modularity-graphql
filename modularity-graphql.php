@@ -12,19 +12,12 @@ namespace ModularityGraphQL;
 
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQLRelay\Relay;
+use Jawira\CaseConverter\Convert;
 use WPGraphQL\ACF\Config;
 use WPGraphQL\AppContext;
 use WPGraphQL\Data\DataSource;
 use WPGraphQL\Model\Post;
 use WPGraphQL\Model\PostType;
-
-function _ws_kebab_to_camel($string, $capitalizeFirstCharacter = false) {
-  $str = str_replace('-', '', ucwords($string, '-'));
-  if (!$capitalizeFirstCharacter) {
-    $str = lcfirst($str);
-  }
-  return $str;
-}
 
 add_filter('acf/load_field_group', function ($field_group) {
   if (
@@ -86,9 +79,9 @@ add_filter(
   function ($args, $post_type) {
     if (preg_match('/^mod-/', $post_type)) {
       $args['show_in_graphql'] = true;
-      $args['graphql_single_name'] = _ws_kebab_to_camel($post_type);
+      $args['graphql_single_name'] = (new Convert($post_type))->toCamel();
       $args['graphql_plural_name'] =
-        'all' . _ws_kebab_to_camel($post_type, true);
+        'all' . (new Convert($post_type))->toPascal();
     }
     return $args;
   },
@@ -104,7 +97,8 @@ add_action(
 
     $modularity_modules_type = [];
     foreach ($wp_registered_sidebars as $sidebar) {
-      $modularity_modules_type['fields'][_ws_kebab_to_camel($sidebar['id'])] = [
+      $field_name = (new Convert($sidebar['id']))->toCamel();
+      $modularity_modules_type['fields'][$field_name] = [
         'type' => ['list_of' => 'ModularityModuleInstance'],
         'resolve' => function ($meta) use ($sidebar) {
           $modules = [];

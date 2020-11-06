@@ -8,5 +8,8 @@
             "name": "Whitespace Dev",
             "email": "code@whitespace.se"
         }
-    ]
+    ],
+    "require": {
+        "jawira/case-converter": "^3.4"
+    }
 }
