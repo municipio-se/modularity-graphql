@@ -215,6 +215,12 @@ add_action(
         return $type_registry->get_type($module_types[$module->post_type]);
       },
     ]);
+    $type_registry->register_field("MediaItem", 'fileContent', [
+      'type' => 'String',
+      'resolve' => function ($media_item) {
+        return file_get_contents($media_item->mediaItemUrl);
+      },
+    ]);
     $type_registry->register_field("MediaItem", 'width', [
       'type' => 'Integer',
       'args' => [
