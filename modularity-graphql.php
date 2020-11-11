@@ -494,3 +494,29 @@ add_action(
   10,
   1
 );
+
+add_action(
+  'graphql_register_types',
+  function ($type_registry) {
+    $type_registry->register_object_type('ModularityOptions', [
+      'fields' => [
+        'enabledModules' => [
+          'type' => ['list_of' => 'ContentType'],
+          'resolve' => function ($options) {
+            return array_map(function ($post_type) {
+              return new PostType(get_post_type_object($post_type));
+            }, $options['enabled-modules']);
+          },
+        ],
+      ],
+    ]);
+    $type_registry->register_field('RootQuery', 'modularityOptions', [
+      'type' => 'ModularityOptions',
+      'resolve' => function () {
+        return get_option('modularity-options');
+      },
+    ]);
+  },
+  10,
+  1
+);
