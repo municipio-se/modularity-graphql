@@ -478,3 +478,19 @@ add_filter(
   10,
   4
 );
+
+add_action(
+  'graphql_register_types',
+  function ($type_registry) {
+    $type_registry->register_field('ContentType', 'modularityEnabled', [
+      'type' => 'Boolean',
+      'resolve' => function ($post_type) {
+        $modularity_options = get_option('modularity-options');
+        $post_types = $modularity_options['enabled-post-types'];
+        return $post_type->name && in_array($post_type->name, $post_types);
+      },
+    ]);
+  },
+  10,
+  1
+);
