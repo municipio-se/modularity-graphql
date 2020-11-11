@@ -147,7 +147,8 @@ add_action(
       ],
     ]);
 
-    $post_types = ['page', 'post', 'operational-status', 'bulletin-board'];
+    $modularity_options = get_option('modularity-options');
+    $post_types = $modularity_options['enabled-post-types'];
 
     foreach ($wp_post_types as $post_type_object) {
       if (!in_array($post_type_object->name, $post_types)) {
