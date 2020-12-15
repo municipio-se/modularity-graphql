@@ -95,29 +95,77 @@ add_action(
     global $wp_registered_sidebars;
     global $wp_post_types;
 
-    $modularity_modules_type = [];
+    $type_registry->register_interface_type('NodeWithModularity', [
+      'fields' => [
+        'modularityAreas' => [
+          'type' => ['list_of' => 'NodeModularityArea'],
+          'resolve' => function ($post) {
+            global $wp_registered_sidebars;
+            $areas = [];
+            foreach ($wp_registered_sidebars as $sidebar) {
+              $areas[] = [
+                'sidebar' => $sidebar,
+                'post' => $post,
+              ];
+            }
+            return $areas;
+          },
+        ],
+        'modularityArea' => [
+          'type' => 'NodeModularityArea',
+          'args' => [
+            'area' => [
+              'type' => 'ModularityAreaEnum',
+            ],
+          ],
+          'resolve' => function ($post, $args) {
+            global $wp_registered_sidebars;
+            return [
+              'sidebar' => $wp_registered_sidebars[$args['area']],
+              'post' => $post,
+            ];
+          },
+        ],
+      ],
+    ]);
+
+    $type_registry->register_object_type('NodeModularityArea', [
+      'fields' => [
+        'name' => [
+          'type' => 'String',
+          'resolve' => function ($area) {
+            return $area['sidebar']['id'];
+          },
+        ],
+        'modules' => [
+          'type' => ['list_of' => 'ModularityModuleInstance'],
+          'resolve' => function ($area) {
+            $post = $area['post'];
+            $sidebar = $area['sidebar'];
+            $meta = get_post_meta($post->ID, 'modularity-modules', true) ?: [];
+            $modules = [];
+            foreach ($meta[$sidebar['id']] ?? [] as $key => $module) {
+              $modules[] = ['key' => $key] + $module;
+            }
+            return $modules;
+          },
+        ],
+      ],
+    ]);
+
+    $modularity_area_enums = [];
     foreach ($wp_registered_sidebars as $sidebar) {
-      $field_name = (new Convert($sidebar['id']))->toCamel();
-      $modularity_modules_type['fields'][$field_name] = [
-        'type' => ['list_of' => 'ModularityModuleInstance'],
-        'resolve' => function ($meta) use ($sidebar) {
-          $modules = [];
-          foreach ($meta[$sidebar['id']] ?? [] as $key => $module) {
-            $modules[] = ['key' => $key] + $module;
-          }
-          return $modules;
-        },
-      ];
+      $enum = (new Convert($sidebar['id']))->toMacro();
+      $modularity_area_enums[$enum] = $sidebar['id'];
     }
 
-    $type_registry->register_object_type(
-      'ModularityModules',
-      $modularity_modules_type
-    );
+    $type_registry->register_enum_type('ModularityAreaEnum', [
+      'values' => $modularity_area_enums,
+    ]);
 
     $type_registry->register_object_type('ModularityModuleInstance', [
       'fields' => [
-        'module' => [
+        'node' => [
           'type' => 'ModularityModule',
           'resolve' => function (
             $module,
@@ -144,29 +192,14 @@ add_action(
             return $module['hidden'];
           },
         ],
+        'key' => [
+          'type' => 'String',
+          'resolve' => function ($module) {
+            return $module['key'];
+          },
+        ],
       ],
     ]);
-
-    $modularity_options = get_option('modularity-options');
-    $post_types = $modularity_options['enabled-post-types'];
-
-    foreach ($wp_post_types as $post_type_object) {
-      if (!in_array($post_type_object->name, $post_types)) {
-        continue;
-      }
-
-      $type_registry->register_field(
-        $post_type_object->graphql_single_name,
-        'modularityModules',
-        [
-          'type' => 'ModularityModules',
-          'resolve' => function ($post) {
-            $meta = get_post_meta($post->ID, 'modularity-modules', true);
-            return $meta ?: [];
-          },
-        ]
-      );
-    }
 
     global $wp_post_types;
     $module_types = [];
@@ -390,6 +423,32 @@ add_action(
   },
   10,
   1
+);
+
+add_filter(
+  'graphql_object_type_interfaces',
+  function ($interfaces, $config, $object_type) {
+    global $wp_post_types;
+    if (!in_array('ContentNode', $interfaces)) {
+      return $interfaces;
+    }
+    foreach ($wp_post_types as $post_type_name => $post_type_object) {
+      if (
+        !empty($post_type_object->graphql_single_name) &&
+        ucfirst($post_type_object->graphql_single_name) === $config['name']
+      ) {
+        $modularity_options = get_option('modularity-options');
+        $post_types = $modularity_options['enabled-post-types'];
+        if (in_array($post_type_name, $post_types)) {
+          $interfaces[] = 'NodeWithModularity';
+        }
+        break;
+      }
+    }
+    return $interfaces;
+  },
+  10,
+  3
 );
 
 add_action(
