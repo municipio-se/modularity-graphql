@@ -257,6 +257,9 @@ add_action(
       'toType' => 'PostObjectUnion',
       // 'connectionArgs' => [],
       'resolveNode' => function ($id, $args, $context, $info) {
+        if($id instanceof Post) {
+          $id = $id->ID;
+        }
         return DataSource::resolve_post_object($id, $context);
       },
       'resolve' => function ($root, $args, $context, $info) {

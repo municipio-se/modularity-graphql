@@ -1,3 +1,9 @@
+## 3.0.1 (January 25, 2021)
+
+### Bugfixes
+
+- Querying `posts` on `ModPosts` caused an error.
+
 ## 3.0.0 (December 15, 2020)
 
 **💥 BREAKING CHANGES:** Restructure schema and remove code that doesn’t belong
