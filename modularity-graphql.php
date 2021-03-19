@@ -142,7 +142,15 @@ add_action(
           'resolve' => function ($area) {
             $post = $area['post'];
             $sidebar = $area['sidebar'];
-            $meta = get_post_meta($post->ID, 'modularity-modules', true) ?: [];
+
+            // Modules are not registered on revisions. Look on the original
+            if ( $post->isRevision && isset( $post->parentDatabaseId ) && absint( $post->parentDatabaseId ) ) {
+              $post_id = $post->parentDatabaseId;
+            } else {
+              $post_id = $post->ID;
+            }
+
+            $meta = get_post_meta($post_id, 'modularity-modules', true) ?: [];
             $modules = [];
             foreach ($meta[$sidebar['id']] ?? [] as $key => $module) {
               $modules[] = ['key' => $key] + $module;

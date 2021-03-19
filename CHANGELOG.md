@@ -1,3 +1,9 @@
+## 3.1.0 (March 19, 2021)
+
+### Bugfixes
+
+- Modules were not registered on revisions
+
 ## 3.0.1 (January 25, 2021)
 
 ### Bugfixes
