@@ -1,3 +1,9 @@
+## 3.2.0 (April 17, 2021)
+
+### New features
+
+- Allow public querying of module post types
+
 ## 3.1.0 (March 19, 2021)
 
 ### Bugfixes

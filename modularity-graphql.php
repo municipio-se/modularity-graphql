@@ -3,7 +3,7 @@
  * Plugin Name: Modularity GraphQL
  * Plugin URI: -
  * Description: Adds Modularity modules to the WPGraphQL Schema
- * Version: 1.0.0
+ * Version: 3.2.0
  * Author: Whitespace Dev
  * Author URI: https://www.whitespace.se/
  */
@@ -79,6 +79,9 @@ add_filter(
   function ($args, $post_type) {
     if (preg_match('/^mod-/', $post_type)) {
       $args['show_in_graphql'] = true;
+      $args['show_in_rest'] = true;
+      $args['publicly_queryable'] = true;
+      $args['public'] = true;
       $args['graphql_single_name'] = (new Convert($post_type))->toCamel();
       $args['graphql_plural_name'] =
         'all' . (new Convert($post_type))->toPascal();
