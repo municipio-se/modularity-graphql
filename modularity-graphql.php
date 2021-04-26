@@ -147,7 +147,11 @@ add_action(
             $sidebar = $area['sidebar'];
 
             // Modules are not registered on revisions. Look on the original
-            if ( $post->isRevision && isset( $post->parentDatabaseId ) && absint( $post->parentDatabaseId ) ) {
+            if (
+              $post->isRevision &&
+              isset($post->parentDatabaseId) &&
+              absint($post->parentDatabaseId)
+            ) {
               $post_id = $post->parentDatabaseId;
             } else {
               $post_id = $post->ID;
@@ -268,7 +272,7 @@ add_action(
       'toType' => 'PostObjectUnion',
       // 'connectionArgs' => [],
       'resolveNode' => function ($id, $args, $context, $info) {
-        if($id instanceof Post) {
+        if ($id instanceof Post) {
           $id = $id->ID;
         }
         return DataSource::resolve_post_object($id, $context);
