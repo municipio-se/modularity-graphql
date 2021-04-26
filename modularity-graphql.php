@@ -539,3 +539,26 @@ add_action(
   10,
   1
 );
+
+define('MODULARITY_GRAPHQL_PATH', dirname(__FILE__));
+define(
+  'MODULARITY_GRAPHQL_AUTOLOAD_PATH',
+  MODULARITY_GRAPHQL_PATH . '/autoload'
+);
+
+function set_acf_group_graphql_field_name($key, $name) {
+  add_filter('acf/init', function () use ($key, $name) {
+    $store = acf_get_local_store('groups');
+    $group = $store->get($key);
+    if (empty($group)) {
+      return;
+    }
+    $group['show_in_graphql'] = true;
+    $group['graphql_field_name'] = $name;
+    $store->set('group_5891b49127038', $group);
+  });
+}
+
+array_map(static function () {
+  include_once func_get_args()[0];
+}, glob(MODULARITY_GRAPHQL_AUTOLOAD_PATH . "/*.php"));
