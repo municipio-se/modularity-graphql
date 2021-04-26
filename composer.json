@@ -9,7 +9,19 @@
             "email": "code@whitespace.se"
         }
     ],
+    "repositories": [
+        {
+            "type":"composer",
+            "url":"https://wpackagist.org"
+        }
+    ],
     "require": {
         "jawira/case-converter": "^3.4"
+    },
+    "require-dev": {
+        "wp-graphql/wp-graphql": "^1.3",
+        "wp-graphql/wp-graphql-acf": "^0.5.1",
+        "helsingborg-stad/modularity": "^2.13",
+        "wpackagist-plugin/advanced-custom-fields": "^5.9"
     }
 }
