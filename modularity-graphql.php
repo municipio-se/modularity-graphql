@@ -309,7 +309,14 @@ add_action(
             break;
           case 'children':
             $data_child_of = get_field('posts_data_child_of', $root->ID, false);
-            $parent = new Post(get_post($data_child_of));
+            if (empty($data_child_of)) {
+              return null;
+            }
+            $parent_post = get_post($data_child_of);
+            if (empty($parent_post)) {
+              return null;
+            }
+            $parent = new Post($parent_post);
             $post_types = \WPGraphQL::get_allowed_post_types();
             $connection = DataSource::resolve_post_objects_connection(
               $parent,
