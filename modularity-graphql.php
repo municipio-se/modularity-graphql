@@ -262,8 +262,8 @@ add_action(
     // Add `posts` field to `ModPosts`
     $type_registry->register_connection([
       'fromType' => 'ModPosts',
-      'fromFieldName' => 'posts',
-      'toType' => 'PostObjectUnion',
+      'fromFieldName' => 'contentNodes',
+      'toType' => 'ContentNode',
       // 'connectionArgs' => [],
       'resolveNode' => function ($id, $args, $context, $info) {
         if ($id instanceof Post) {
