@@ -420,7 +420,7 @@ add_action(
   'graphql_register_types',
   function ($type_registry) {
     $type_registry->register_field(
-      'ModPosts_Datasource_data',
+      'ModPosts_Modpostsdatasource_data',
       'postContentMedia',
       [
         'type' => ['list_of' => 'MediaItem'],
