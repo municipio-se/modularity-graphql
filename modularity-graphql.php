@@ -217,32 +217,11 @@ add_action(
     ]);
 
     global $wp_post_types;
-    $module_types = [];
     foreach ($wp_post_types as $post_type_slug => $post_type_object) {
       // Only consider modularity module post types
       if (!preg_match('/^mod-/', $post_type_slug)) {
         continue;
       }
-
-      // Populate map of post type slugs and their graphql names
-      $module_types[$post_type_slug] = $post_type_object->graphql_single_name;
-
-      // Add `hideTitle` field to all modularity modules
-      $type_registry->register_field(
-        $post_type_object->graphql_single_name,
-        'hideTitle',
-        [
-          'type' => 'Boolean',
-          'resolve' => function ($post) {
-            $meta = get_post_meta(
-              $post->ID,
-              'modularity-module-hide-title',
-              true
-            );
-            return $meta ?: false;
-          },
-        ]
-      );
 
       // Add `nonce` field to modularity form modules
       if ($post_type_slug === 'mod-form') {
@@ -389,6 +368,17 @@ add_action(
   10,
   1
 );
+
+add_action('graphq_register_types', function () {
+  // Add `hideTitle` field to all content types
+  register_graphql_field('ContentNode', 'hideTitle', [
+    'type' => 'Boolean',
+    'resolve' => function ($post) {
+      $meta = get_post_meta($post->ID, 'modularity-module-hide-title', true);
+      return $meta ?: false;
+    },
+  ]);
+});
 
 add_filter(
   'graphql_object_type_interfaces',
