@@ -369,16 +369,28 @@ add_action(
   1
 );
 
-add_action('graphq_register_types', function () {
-  // Add `hideTitle` field to all content types
-  register_graphql_field('ContentNode', 'hideTitle', [
-    'type' => 'Boolean',
-    'resolve' => function ($post) {
-      $meta = get_post_meta($post->ID, 'modularity-module-hide-title', true);
-      return $meta ?: false;
-    },
-  ]);
-});
+// Add `hideTitle` field to `ContentNode`
+add_filter(
+  'graphql_interface_fields',
+  function ($fields, $type_name) {
+    if ($type_name == 'ContentNode') {
+      $fields['hideTitle'] = [
+        'type' => 'Boolean',
+        'resolve' => function ($post) {
+          $meta = get_post_meta(
+            $post->ID,
+            'modularity-module-hide-title',
+            true
+          );
+          return $meta ?: false;
+        },
+      ];
+    }
+    return $fields;
+  },
+  10,
+  2
+);
 
 add_filter(
   'graphql_object_type_interfaces',
