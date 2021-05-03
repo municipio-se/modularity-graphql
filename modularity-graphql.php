@@ -181,7 +181,7 @@ add_action(
     $type_registry->register_object_type('ModularityModuleInstance', [
       'fields' => [
         'node' => [
-          'type' => 'ModularityModule',
+          'type' => 'ContentNode',
           'resolve' => function (
             $module,
             $args,
@@ -258,12 +258,6 @@ add_action(
         );
       }
     }
-    $type_registry->register_union_type('ModularityModule', [
-      'typeNames' => array_values($module_types),
-      'resolveType' => function ($module) use ($module_types, $type_registry) {
-        return $type_registry->get_type($module_types[$module->post_type]);
-      },
-    ]);
 
     // Add `posts` field to `ModPosts`
     $type_registry->register_connection([
