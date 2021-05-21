@@ -547,6 +547,18 @@ add_action(
   1
 );
 
+/**
+ * Adds `showInMenu` field to `Page`
+ */
+add_action("graphql_register_types", function ($type_registry) {
+  $type_registry->register_field("Page", "showInMenu", [
+    "type" => "Boolean",
+    "resolve" => function ($post) {
+      return !get_field("hide_in_menu", $post->ID);
+    },
+  ]);
+});
+
 define('MODULARITY_GRAPHQL_PATH', dirname(__FILE__));
 define(
   'MODULARITY_GRAPHQL_AUTOLOAD_PATH',

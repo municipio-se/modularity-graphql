@@ -1,3 +1,9 @@
+## 3.3.0 (Maj 21, 2021)
+
+### New features
+
+– Add showInMenu field
+
 ## 3.2.0 (April 17, 2021)
 
 ### New features
