@@ -296,13 +296,13 @@ add_action(
               return null;
             }
             $parent = new Post($parent_post);
-            $post_types = \WPGraphQL::get_allowed_post_types();
+            $post_type = $parent->post_type;
             $connection = DataSource::resolve_post_objects_connection(
               $parent,
               $args,
               $context,
               $info,
-              $post_types
+              $post_type
             );
             $connection = apply_filters(
               'modularity-graphql/ModPosts/posts/connection',
