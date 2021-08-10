@@ -205,7 +205,7 @@ add_action(
           'type' => 'Boolean',
           'resolve' => function ($module) {
             if (is_string($module['hidden'])) {
-              return $module['hidden'] === "true";
+              return $module['hidden'] === 'true';
             }
 
             return $module['hidden'];
@@ -491,4 +491,4 @@ define(
 
 array_map(static function () {
   include_once func_get_args()[0];
-}, glob(MODULARITY_GRAPHQL_AUTOLOAD_PATH . "/*.php"));
+}, glob(MODULARITY_GRAPHQL_AUTOLOAD_PATH . '/*.php'));
