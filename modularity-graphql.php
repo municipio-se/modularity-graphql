@@ -15,6 +15,7 @@ use GraphQLRelay\Relay;
 use Jawira\CaseConverter\Convert;
 use WPGraphQL\ACF\Config;
 use WPGraphQL\AppContext;
+use WPGraphQL\Data\Connection\PostObjectConnectionResolver;
 use WPGraphQL\Data\DataSource;
 use WPGraphQL\Model\Post;
 use WPGraphQL\Model\PostType;
@@ -247,49 +248,20 @@ add_action(
       'fromFieldName' => 'contentNodes',
       'toType' => 'ContentNode',
       // 'connectionArgs' => [],
-      'resolveNode' => function ($id, $args, $context, $info) {
-        if ($id instanceof Post) {
-          $id = $id->ID;
-        }
-        return DataSource::resolve_post_object((int) $id, $context);
-      },
       'resolve' => function ($root, $args, $context, $info) {
         // TODO: Use `posts_count` field as limit in wp query
         $data_source = get_field('posts_data_source', $root->ID, false);
         switch ($data_source) {
           case 'manual':
-            $data_posts = array_map(function($id){
-              return new Post(get_post($id));
-            }, get_field('posts_data_posts', $root->ID, false));
-            $connection = Relay::connectionFromArray($data_posts, $args);
-            $nodes = [];
-            if (
-              !empty($connection['edges']) &&
-              is_array($connection['edges'])
-            ) {
-              foreach ($connection['edges'] as $edge) {
-                $nodes[] = !empty($edge['node']) ? $edge['node'] : null;
-              }
-            }
-            $connection['nodes'] = !empty($nodes) ? $nodes : null;
-            $connection = apply_filters(
-              'modularity-graphql/ModPosts/posts/connection',
-              $connection,
-              $data_source,
+            $resolver = new PostObjectConnectionResolver(
               $root,
               $args,
               $context,
-              $info
+              $info,
+              'any'
             );
-            $connection = apply_filters(
-              "modularity-graphql/ModPosts/posts/connection/manual",
-              $connection,
-              $root,
-              $args,
-              $context,
-              $info
-            );
-            return $connection;
+            $data_posts = get_field('posts_data_posts', $root->ID, false);
+            $resolver->set_query_arg('post__in', $data_posts);
             break;
           case 'children':
             $data_child_of = get_field('posts_data_child_of', $root->ID, false);
@@ -302,71 +274,30 @@ add_action(
             }
             $parent = new Post($parent_post);
             $post_type = $parent->post_type;
-            $connection = DataSource::resolve_post_objects_connection(
-              $parent,
+            $resolver = new PostObjectConnectionResolver(
+              $root,
               $args,
               $context,
               $info,
               $post_type
             );
-            $connection = apply_filters(
-              'modularity-graphql/ModPosts/posts/connection',
-              $connection,
-              $data_source,
-              $root,
-              $args,
-              $context,
-              $info
-            );
-            $connection = apply_filters(
-              "modularity-graphql/ModPosts/posts/connection/children",
-              $connection,
-              $root,
-              $args,
-              $context,
-              $info
-            );
-            return $connection;
+            $resolver->set_query_arg('post_parent', $parent->ID);
             break;
           case 'posttype':
             $post_type = get_field('posts_data_post_type', $root->ID, false);
-            $connection = DataSource::resolve_post_objects_connection(
-              null,
+            $resolver = new PostObjectConnectionResolver(
+              $root,
               $args,
               $context,
               $info,
               $post_type
             );
-            $connection = apply_filters(
-              'modularity-graphql/ModPosts/posts/connection',
-              $connection,
-              $data_source,
-              $root,
-              $args,
-              $context,
-              $info
-            );
-            $connection = apply_filters(
-              "modularity-graphql/ModPosts/posts/connection/posttype",
-              $connection,
-              $post_type,
-              $root,
-              $args,
-              $context,
-              $info
-            );
-            $connection = apply_filters(
-              "modularity-graphql/ModPosts/posts/connection/posttype/$post_type",
-              $connection,
-              $root,
-              $args,
-              $context,
-              $info
-            );
-            return $connection;
             break;
+          default:
+            return null;
         }
-        return null;
+        $connection = $resolver->get_connection();
+        return $connection;
       },
     ]);
   },
