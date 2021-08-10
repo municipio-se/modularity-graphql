@@ -188,7 +188,10 @@ add_action(
             AppContext $context,
             ResolveInfo $info
           ) {
-            return DataSource::resolve_post_object($module['postid'], $context);
+            return DataSource::resolve_post_object(
+              (int) $module['postid'],
+              $context
+            );
           },
         ],
         'columnWidth' => [
@@ -248,7 +251,7 @@ add_action(
         if ($id instanceof Post) {
           $id = $id->ID;
         }
-        return DataSource::resolve_post_object($id, $context);
+        return DataSource::resolve_post_object((int) $id, $context);
       },
       'resolve' => function ($root, $args, $context, $info) {
         // TODO: Use `posts_count` field as limit in wp query
