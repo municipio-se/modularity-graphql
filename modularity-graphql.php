@@ -255,7 +255,7 @@ add_action(
         $data_source = get_field('posts_data_source', $root->ID, false);
         switch ($data_source) {
           case 'manual':
-            $data_posts = array_map(function($id){
+            $data_posts = array_map(function ($id) {
               return new Post(get_post($id));
             }, get_field('posts_data_posts', $root->ID, false));
             $connection = Relay::connectionFromArray($data_posts, $args);
