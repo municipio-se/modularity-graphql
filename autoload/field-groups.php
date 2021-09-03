@@ -21,6 +21,9 @@ set_acf_group_graphql_field_name('group_5805e5dc0a3be', 'modContactsOptions');
 // Fileslist
 set_acf_group_graphql_field_name('group_5756ce3e48783', 'modFileslistOptions');
 
+// Form
+set_acf_group_graphql_field_name('group_58eb301ecb36a', 'modFormOptions');
+
 // Gallery
 set_acf_group_graphql_field_name('group_5666af6d26b7c', 'modGalleryOptions');
 
