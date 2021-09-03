@@ -3,7 +3,7 @@
  * Plugin Name: Modularity GraphQL
  * Plugin URI: -
  * Description: Adds Modularity modules to the WPGraphQL Schema
- * Version: 3.2.0
+ * Version: 5.1.0
  * Author: Whitespace Dev
  * Author URI: https://www.whitespace.se/
  */
