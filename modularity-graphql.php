@@ -370,11 +370,12 @@ add_action(
             $post_content,
             $matches
           );
-          $posts = array_map(function ($id) {
-            $post = get_post($id);
-            return new Post($post);
-          }, array_unique($matches[1]));
-          return $posts;
+          return array_filter(
+            array_map(function ($id) {
+              $post = get_post($id);
+              return !empty($post) ? new Post($post) : null;
+            }, array_unique($matches[1]))
+          );
         },
       ]
     );
