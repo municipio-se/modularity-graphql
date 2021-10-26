@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Plugin Name: Modularity GraphQL
  * Plugin URI: -
@@ -262,6 +263,8 @@ add_action(
             );
             $data_posts = get_field('posts_data_posts', $root->ID, false);
             $resolver->set_query_arg('post__in', $data_posts);
+            $resolver->set_query_arg('orderby', 'post__in');
+
             break;
           case 'children':
             $data_child_of = get_field('posts_data_child_of', $root->ID, false);
