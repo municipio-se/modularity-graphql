@@ -309,7 +309,12 @@ add_action(
           apply_filters(
             'modularity_graphql/ModPosts/contentNodes/PostObjectConnectionResolver',
             $resolver,
-            $data_source
+            $data_source,
+            $parent_post,
+            $root,
+            $args,
+            $context,
+            $info
           ) ?? $resolver;
 
         $connection = $resolver ? $resolver->get_connection() : null;
