@@ -162,7 +162,7 @@ add_action(
             $meta = get_post_meta($post_id, 'modularity-modules', true) ?: [];
             $modules = [];
             foreach ($meta[$sidebar['id']] ?? [] as $key => $module) {
-              $modules[] = ['key' => $key] + $module;
+              $modules[] = ['key' => $key, 'area' => $area] + $module;
             }
             return $modules;
           },
@@ -190,10 +190,15 @@ add_action(
             AppContext $context,
             ResolveInfo $info
           ) {
-            return DataSource::resolve_post_object(
-              (int) $module['postid'],
-              $context
-            );
+            return $context
+              ->get_loader('post')
+              ->load_deferred((int) $module['postid'])
+              ->then(function ($post) use ($module) {
+                if ($post instanceof Post) {
+                  $post->modularity_module = $module;
+                }
+                return $post;
+              });
           },
         ],
         'columnWidth' => [
@@ -252,6 +257,7 @@ add_action(
       'resolve' => function ($root, $args, $context, $info) {
         // TODO: Use `posts_count` field as limit in wp query
         $data_source = get_field('posts_data_source', $root->ID, false);
+        $parent_post = $root->modularity_module["area"]["post"] ?? $root;
         switch ($data_source) {
           case 'manual':
             $resolver = new PostObjectConnectionResolver(
@@ -267,15 +273,13 @@ add_action(
             break;
           case 'children':
             $data_child_of = get_field('posts_data_child_of', $root->ID, false);
-            if (empty($data_child_of)) {
-              return null;
+            if (!empty($data_child_of)) {
+              $parent_post_object = get_post($data_child_of);
+              if (!empty($parent_post_object)) {
+                $parent_post = new Post($parent_post_object);
+              }
             }
-            $parent_post = get_post($data_child_of);
-            if (empty($parent_post)) {
-              return null;
-            }
-            $parent = new Post($parent_post);
-            $post_type = $parent->post_type;
+            $post_type = $parent_post->post_type;
             $resolver = new PostObjectConnectionResolver(
               $root,
               $args,
@@ -283,7 +287,7 @@ add_action(
               $info,
               $post_type
             );
-            $resolver->set_query_arg('post_parent', $parent->ID);
+            $resolver->set_query_arg('post_parent', $parent_post->ID);
             break;
           case 'posttype':
             $post_type = get_field('posts_data_post_type', $root->ID, false);
@@ -294,6 +298,7 @@ add_action(
               $info,
               $post_type
             );
+            $resolver->set_query_arg("post__not_in", [$parent_post->ID]);
             break;
           default:
             $resolver = null;
