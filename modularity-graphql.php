@@ -190,15 +190,17 @@ add_action(
             AppContext $context,
             ResolveInfo $info
           ) {
-            return $context
-              ->get_loader('post')
-              ->load_deferred((int) $module['postid'])
-              ->then(function ($post) use ($module) {
-                if ($post instanceof Post) {
-                  $post->modularity_module = $module;
-                }
-                return $post;
-              });
+            if (!empty($module['postid'])) {
+              return $context
+                ->get_loader('post')
+                ->load_deferred((int) $module['postid'])
+                ->then(function ($post) use ($module) {
+                  if ($post instanceof Post) {
+                    $post->modularity_module = $module;
+                  }
+                  return $post;
+                });
+            }
           },
         ],
         'columnWidth' => [
