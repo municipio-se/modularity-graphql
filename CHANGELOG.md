@@ -1,3 +1,15 @@
+## [5.4.0](https://github.com/municipio-se/modularity-graphql/compare/5.3.0...5.4.0) (2022-10-18)
+
+
+### Features
+
+* Add support for module shortcodes ([d436a2c](https://github.com/municipio-se/modularity-graphql/commit/d436a2c64c5294097ef19d07e2d63944a6d6bc37))
+
+
+### Bug Fixes
+
+* check for undefined `postid` index before resolving ([1387cb1](https://github.com/municipio-se/modularity-graphql/commit/1387cb1417cd3b774e068cd2a2496aa297f427a9))
+
 ## [5.3.0](https://github.com/municipio-se/modularity-graphql/compare/5.2.0...5.3.0) (2022-04-13)
 
 
