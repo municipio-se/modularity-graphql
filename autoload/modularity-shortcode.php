@@ -79,6 +79,10 @@ add_action("graphql_register_types", function ($type_registry) {
 
       $module_ids = modularity_graphql_extract_content_module_ids($content);
 
+      if (empty($module_ids)) {
+        return null;
+      }
+
       $resolver = new PostObjectConnectionResolver(
         $parent,
         $args,
@@ -110,6 +114,10 @@ add_action(
         $content = $parent["field_57625914110b2"];
 
         $module_ids = modularity_graphql_extract_content_module_ids($content);
+
+        if (empty($module_ids)) {
+          return null;
+        }
 
         $resolver = new PostObjectConnectionResolver(
           $parent,
