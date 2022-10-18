@@ -1,3 +1,10 @@
+### [5.5.1](https://github.com/municipio-se/modularity-graphql/compare/5.5.0...5.5.1) (2022-10-18)
+
+
+### Bug Fixes
+
+* `contentModularityModules` sometimes returned all modules ([8c1d47c](https://github.com/municipio-se/modularity-graphql/commit/8c1d47ca9ae7c01c91f17aec10187f55e5974899))
+
 ## [5.5.0](https://github.com/municipio-se/modularity-graphql/compare/5.4.0...5.5.0) (2022-10-18)
 
 
