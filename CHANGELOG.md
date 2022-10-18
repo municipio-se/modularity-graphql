@@ -1,3 +1,10 @@
+## [5.5.0](https://github.com/municipio-se/modularity-graphql/compare/5.4.0...5.5.0) (2022-10-18)
+
+
+### Features
+
+* Allow module shortcodes inside modules ([d74fbaa](https://github.com/municipio-se/modularity-graphql/commit/d74fbaaa4e89a91892a8bb62c93b216074a88680))
+
 ## [5.4.0](https://github.com/municipio-se/modularity-graphql/compare/5.3.0...5.4.0) (2022-10-18)
 
 
