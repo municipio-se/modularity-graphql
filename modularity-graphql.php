@@ -250,6 +250,66 @@ add_action(
       }
     }
 
+    $type_registry->register_field('ContentType', 'modularityAreas', [
+      'type' => ['list_of' => 'ContentTypeModularityArea'],
+      'resolve' => function ($content_type) {
+        global $wp_registered_sidebars;
+        $areas = [];
+        foreach ($wp_registered_sidebars as $sidebar) {
+          $areas[] = [
+            'sidebar' => $sidebar,
+            'content_type' => $content_type,
+          ];
+        }
+        return $areas;
+      },
+    ]);
+    $type_registry->register_field('ContentType', 'modularityArea', [
+      'type' => 'ContentTypeModularityArea',
+      'args' => [
+        'area' => [
+          'type' => 'ModularityAreaEnum',
+        ],
+      ],
+      'resolve' => function ($content_type, $args) {
+        global $wp_registered_sidebars;
+        return [
+          'sidebar' => $wp_registered_sidebars[$args['area']],
+          'content_type' => $content_type,
+        ];
+      },
+    ]);
+
+    $type_registry->register_object_type('ContentTypeModularityArea', [
+      'fields' => [
+        'name' => [
+          'type' => 'String',
+          'resolve' => function ($area) {
+            return $area['sidebar']['id'];
+          },
+        ],
+        'modules' => [
+          'type' => ['list_of' => 'ModularityModuleInstance'],
+          'resolve' => function ($area) {
+            $content_type = $area['content_type'];
+            $sidebar = $area['sidebar'];
+
+            $meta =
+              get_option(
+                "modularity_archive-{$content_type->name}_modules",
+                true
+              ) ?:
+              [];
+            $modules = [];
+            foreach ($meta[$sidebar['id']] ?? [] as $key => $module) {
+              $modules[] = ['key' => $key, 'area' => $area] + $module;
+            }
+            return $modules;
+          },
+        ],
+      ],
+    ]);
+
     // Add `posts` field to `ModPosts`
     $type_registry->register_connection([
       'fromType' => 'ModPosts',
@@ -367,6 +427,32 @@ add_filter(
         $post_types = $modularity_options['enabled-post-types'];
         if (in_array($post_type_name, $post_types)) {
           $interfaces[] = 'NodeWithModularity';
+        }
+        break;
+      }
+    }
+    return $interfaces;
+  },
+  10,
+  3
+);
+
+add_filter(
+  'graphql_object_type_interfaces',
+  function ($interfaces, $config, $object_type) {
+    global $wp_post_types;
+    if ($object_type->name != 'ContentType') {
+      return $interfaces;
+    }
+    foreach ($wp_post_types as $post_type_name => $post_type_object) {
+      if (
+        !empty($post_type_object->graphql_single_name) &&
+        ucfirst($post_type_object->graphql_single_name) === $object_type->name
+      ) {
+        $modularity_options = get_option('modularity-options');
+        $post_types = $modularity_options['enabled-post-types'];
+        if (in_array($post_type_name, $post_types)) {
+          $interfaces[] = 'ContentTypeWithModularity';
         }
         break;
       }
