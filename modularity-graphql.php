@@ -350,6 +350,10 @@ add_action(
               $post_type
             );
             $resolver->set_query_arg('post_parent', $parent_post->ID);
+            $resolver->set_query_arg('orderby', [
+              'menu_order' => 'ASC',
+              'post_id' => 'ASC',
+            ]);
             break;
           case 'posttype':
             $post_type = get_field('posts_data_post_type', $root->ID, false);
