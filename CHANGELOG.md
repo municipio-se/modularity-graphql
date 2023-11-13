@@ -1,3 +1,20 @@
+## [6.0.0](https://github.com/municipio-se/modularity-graphql/compare/5.5.1...6.0.0) (2023-11-13)
+
+
+### ⚠ BREAKING CHANGES
+
+* Disable Gutenberg for post and widget editors
+
+### Features
+
+* Disable Gutenberg for post and widget editors ([d4e7385](https://github.com/municipio-se/modularity-graphql/commit/d4e73852a26c49dbe54b3cb706e9b1d765c51e1d))
+* Expose post type archive modules ([442e230](https://github.com/municipio-se/modularity-graphql/commit/442e230925821e2af480de4e1f3597d404ab259e))
+
+
+### Bug Fixes
+
+* Child post sorting ([5da3044](https://github.com/municipio-se/modularity-graphql/commit/5da3044286785b4b3821074a9b0ea83ad94cd90c))
+
 ### [5.5.1](https://github.com/municipio-se/modularity-graphql/compare/5.5.0...5.5.1) (2022-10-18)
 
 
